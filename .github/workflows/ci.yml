@@ -23,54 +23,36 @@ jobs:
       - name: 安装依赖
         run: pip install -r requirements.txt
 
-      - name: 自检（不发任何请求，无需 key）
+      - name: 离线自检（不发请求，无需 key）
+        run: PYTHONPATH=src python scripts/selfcheck.py
+
+      - name: 自检必须能发现被改坏的防呆
         run: |
-          PYTHONPATH=src python - <<'PYEOF'
-          import openrouter_client as oc
-
-          # 缺 key 必须在构造配置时就失败
-          try:
-              oc.Config.from_env({})
-              raise SystemExit("FAIL: 缺 key 时没有报错")
-          except oc.OpenRouterConfigError:
-              pass
-
-          # key 格式不对也要立刻失败
-          try:
-              oc.Config.from_env({"OPENROUTER_API_KEY": "not-an-openrouter-key"})
-              raise SystemExit("FAIL: key 格式错误时没有报错")
-          except oc.OpenRouterConfigError:
-              pass
-
-          cfg = oc.Config.from_env({
-              "OPENROUTER_API_KEY": "sk-or-v1-" + "x" * 64,
-              "OPENROUTER_MODEL_IMAGE": "openai/gpt-image-2.5-sunburst",
-              "OPENROUTER_MODEL_TEXT": "anthropic/claude-fable-5.1",
-          })
-          assert cfg.base_url == oc.DEFAULT_BASE_URL
-          assert cfg.model_image == "openai/gpt-image-2.5-sunburst"
-
-          # 未配生图模型时不能默默放行
-          bare = oc.Config.from_env({"OPENROUTER_API_KEY": "sk-or-v1-" + "x" * 64})
-          try:
-              oc.generate_image("test", cfg=bare)
-              raise SystemExit("FAIL: 未配模型时没有报错")
-          except oc.OpenRouterConfigError:
-              pass
-
-          # 空 prompt 要挡住
-          try:
-              oc.generate_image("   ", cfg=cfg)
-              raise SystemExit("FAIL: 空 prompt 没有报错")
-          except ValueError:
-              pass
-
-          print("自检通过")
+          # 反向用例：故意把「某一档没配就报错」改成静默返回空字符串，
+          # 自检必须因此失败。自检自己不设反向用例，就可能一直绿着却什么都没测。
+          cp src/openrouter_client/config.py /tmp/config.bak
+          python - <<'PYEOF'
+          from pathlib import Path
+          p = Path("src/openrouter_client/config.py")
+          s = p.read_text(encoding="utf-8")
+          broken = s.replace(
+              'raise OpenRouterConfigError(f"未配置 {env_name}")',
+              'return ""',
+          )
+          assert broken != s, "没能改坏，反向用例本身失效了"
+          p.write_text(broken, encoding="utf-8")
           PYEOF
+          if PYTHONPATH=src python scripts/selfcheck.py; then
+            echo "反向用例失败：防呆被改坏后自检竟然还通过"
+            cp /tmp/config.bak src/openrouter_client/config.py
+            exit 1
+          fi
+          cp /tmp/config.bak src/openrouter_client/config.py
+          echo "反向用例通过：改坏防呆后自检确实会红"
 
       - name: 可安装性检查
         run: |
           pip install build
           python -m build --wheel
           pip install dist/*.whl
-          python -c "import openrouter_client; print('wheel 可安装，import 正常')"
+          python -c "import openrouter_client as m; print('wheel 可安装:', sorted(x for x in m.__all__ if not x.isupper())[:5])"
