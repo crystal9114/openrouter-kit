@@ -1,0 +1,18 @@
+# 凭证绝不进仓，真值在密匣 mixia
+.env
+*.env
+!example.env
+
+# 生成的图片
+out/
+*.png
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/

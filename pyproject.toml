@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openrouter-kit"
+version = "0.1.0"
+description = "OpenRouter 文本与生图的统一调用封装，配置全部走环境变量"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31"]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src/openrouter_client.py"]
+sources = ["src"]
