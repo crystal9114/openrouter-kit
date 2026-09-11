@@ -41,9 +41,11 @@ Use the /api/beta/batches endpoint instead.
 |---|---|---|---|
 | 生图 | `OPENROUTER_MODEL_IMAGE` | `openai/gpt-image-2.5-sunburst` | $0.0049/张 |
 | 日常 | `OPENROUTER_MODEL_TEXT` | `google/gemini-3.8-flash` | $0.75 / $3.75 每 M |
-| 掌控 | `OPENROUTER_MODEL_HEAVY` | `anthropic/claude-fable-5.1` | $10 / $50 每 M |
+| 掌控 | `OPENROUTER_MODEL_HEAVY` | `google/gemini-3.8-flash` | 同上，靠放开思考拉开档位 |
 
-掌控档贵 13.3 倍，所以默认走日常档，需要时显式 `chat(..., heavy=True)`。
+两档同一个模型，区别只在思考强度：日常档压到 `low`（$0.000115），掌控档不压（$0.001116）。需要深一点的推理时显式 `chat(..., heavy=True)`。
+
+2026-09-11 停用 Fable 5.1（$10/$50 太贵）。**也不要换成 Gemini Pro 档**：实测 `gemini-3.1-pro-preview` 对 `effort=low` 不买账，思考照跑 478 tokens、正文还被截断，单次 $0.005972，比 Fable 还贵。
 
 某一档没配会直接报错，**不会静默回退到别的档**：悄悄换成贵的会烧钱，换成便宜的会让质量无声下降，两种都比报错难查。
 

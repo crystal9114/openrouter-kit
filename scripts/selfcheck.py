@@ -15,7 +15,7 @@ FULL = {
     "OPENROUTER_API_KEY": FAKE_KEY,
     "OPENROUTER_MODEL_IMAGE": "openai/gpt-image-2.5-sunburst",
     "OPENROUTER_MODEL_TEXT": "google/gemini-3.8-flash",
-    "OPENROUTER_MODEL_HEAVY": "anthropic/claude-fable-5.1",
+    "OPENROUTER_MODEL_HEAVY": "google/gemini-3.8-flash",
 }
 
 failures: list[str] = []
