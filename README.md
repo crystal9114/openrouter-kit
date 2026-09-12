@@ -2,7 +2,7 @@
 
 OpenRouter 的文本、生图与跑批封装。配置全部走环境变量，代码里没有任何硬编码的 key 或模型名。
 
-真值存在密匣 mixia 的 `secrets/personal/common.env`，本仓只有占位示例。
+真值存在密匣 mixia 的 `secrets/personal/projects/openrouter.env`，本仓只有占位示例。
 
 ## 三个端点，走错就 404
 
@@ -41,7 +41,7 @@ Use the /api/beta/batches endpoint instead.
 |---|---|---|---|
 | 生图 | `OPENROUTER_MODEL_IMAGE` | `openai/gpt-image-2.5-sunburst` | $0.0049/张 |
 | 日常 | `OPENROUTER_MODEL_TEXT` | `google/gemini-3.8-flash` | $0.75 / $3.75 每 M |
-| 掌控 | `OPENROUTER_MODEL_HEAVY` | `google/gemini-3.8-flash` | 同上，靠放开思考拉开档位 |
+| 掌控 | `OPENROUTER_MODEL_HEAVY` | `anthropic/claude-fable-5.1` | 换一个量级的模型，不是同模型多想一会儿 |
 
 两档同一个模型，区别只在思考强度：日常档压到 `low`（$0.000115），掌控档不压（$0.001116）。需要深一点的推理时显式 `chat(..., heavy=True)`。
 
@@ -95,7 +95,7 @@ pip install git+https://github.com/crystal9114/openrouter-kit.git
 先注入凭证：
 
 ```bash
-set -a; . /path/to/mixia/secrets/personal/common.env; set +a
+set -a; . /path/to/mixia/secrets/personal/projects/openrouter.env; set +a
 ```
 
 实时调用：
@@ -144,7 +144,7 @@ for it in items:
 services:
   yourapp:
     env_file:
-      - /www/wwwroot/mixia/secrets/personal/common.env
+      - /www/wwwroot/mixia/secrets/personal/projects/openrouter.env
 ```
 
 改了 mixia 的值必须 `docker compose up -d --force-recreate`，`restart` 不会重读 env_file。

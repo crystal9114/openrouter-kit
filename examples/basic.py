@@ -2,7 +2,7 @@
 
 运行前先注入凭证（真值在密匣 mixia）：
 
-    set -a; . /path/to/mixia/secrets/personal/common.env; set +a
+    set -a; . /path/to/mixia/secrets/personal/projects/openrouter.env; set +a
     PYTHONPATH=src python examples/basic.py
 """
 

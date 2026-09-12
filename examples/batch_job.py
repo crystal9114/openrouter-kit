@@ -3,7 +3,7 @@
 实测一个 2 条的小批次约 5 分钟返回，官方承诺窗口是 24 小时。
 适合半夜出稿这类不等结果的活，聊天和写代码用不了。
 
-    set -a; . /path/to/mixia/secrets/personal/common.env; set +a
+    set -a; . /path/to/mixia/secrets/personal/projects/openrouter.env; set +a
     PYTHONPATH=src python examples/batch_job.py
 """
 
